@@ -1,0 +1,57 @@
+import os
+import shutil
+
+# Define the folder to organize (e.g., the Downloads folder)
+FOLDER_TO_ORGANIZE = r'C:\Users\YourUsername\Downloads'  # Change this to your target folder
+
+# Define the folder mappings based on file extensions
+FILE_TYPE_MAPPINGS = {
+    'Documents': ['.pdf', '.doc', '.docx', '.txt', '.ppt', '.pptx', '.xls', '.xlsx'],
+    'Images': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff'],
+    'Videos': ['.mp4', '.mov', '.wmv', '.flv', '.avi', '.mkv'],
+    'Music': ['.mp3', '.wav', '.flac', '.aac'],
+    'Archives': ['.zip', '.rar', '.tar', '.gz', '.7z'],
+    'Scripts': ['.py', '.js', '.sh', '.bat'],
+    'Executables': ['.exe', '.msi'],
+}
+
+# Function to create directories if they do not exist
+def create_directories(base_folder):
+    for category in FILE_TYPE_MAPPINGS.keys():
+        folder_path = os.path.join(base_folder, category)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+# Function to organize files
+def organize_files(folder_path):
+    for filename in os.listdir(folder_path):
+        # Get the file extension
+        file_extension = os.path.splitext(filename)[1].lower()
+        
+        # Check the file type and move to the appropriate folder
+        moved = False
+        for category, extensions in FILE_TYPE_MAPPINGS.items():
+            if file_extension in extensions:
+                src_file = os.path.join(folder_path, filename)
+                dest_folder = os.path.join(folder_path, category)
+                shutil.move(src_file, dest_folder)
+                print(f"Moved {filename} to {category} folder.")
+                moved = True
+                break
+        
+        # If the file type is not listed, move it to an "Others" folder
+        if not moved and os.path.isfile(os.path.join(folder_path, filename)):
+            others_folder = os.path.join(folder_path, 'Others')
+            if not os.path.exists(others_folder):
+                os.makedirs(others_folder)
+            shutil.move(os.path.join(folder_path, filename), others_folder)
+            print(f"Moved {filename} to Others folder.")
+
+# Main function to run the file organizer
+def main():
+    create_directories(FOLDER_TO_ORGANIZE)
+    organize_files(FOLDER_TO_ORGANIZE)
+    print("File organization completed!")
+
+if __name__ == '__main__':
+    main()
