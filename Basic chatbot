@@ -1,0 +1,67 @@
+import nltk
+import random
+import string
+from nltk.corpus import wordnet
+from nltk.tokenize import word_tokenize
+
+# Sample responses
+RESPONSES = {
+    "greeting": ["Hello! How can I help you today?", "Hi there! How can I assist you?"],
+    "goodbye": ["Goodbye! Have a nice day!", "See you later!", "Take care!"],
+    "thanks": ["You're welcome!", "No problem!", "Glad I could help!"],
+    "unknown": ["Sorry, I didn't understand that.", "Can you please rephrase?", "I'm not sure what you mean."]
+}
+
+# Sample conversation data
+CONVERSATIONS = {
+    "how are you": ["I'm just a bot, but I'm doing fine!", "I'm functioning as expected! How about you?"],
+    "what is your name": ["I'm a simple chatbot created to help you.", "I don't have a name yet. What would you like to call me?"],
+    "what can you do": ["I can chat with you and answer some basic questions.", "I'm here to talk and help with basic tasks!"],
+}
+
+# Function to preprocess user input
+def preprocess_input(user_input):
+    user_input = user_input.lower()  # Convert to lowercase
+    user_input = user_input.translate(str.maketrans('', '', string.punctuation))  # Remove punctuation
+    return user_input
+
+# Function to get a response from the chatbot
+def get_response(user_input):
+    user_input = preprocess_input(user_input)
+    
+    # Check for greetings
+    if any(greet in user_input for greet in ["hi", "hello", "hey"]):
+        return random.choice(RESPONSES["greeting"])
+    
+    # Check for goodbyes
+    if any(bye in user_input for bye in ["bye", "goodbye", "see you"]):
+        return random.choice(RESPONSES["goodbye"])
+    
+    # Check for gratitude
+    if any(thank in user_input for thank in ["thanks", "thank you"]):
+        return random.choice(RESPONSES["thanks"])
+    
+    # Check predefined conversation data
+    for key, value in CONVERSATIONS.items():
+        if key in user_input:
+            return random.choice(value)
+    
+    # Default unknown response
+    return random.choice(RESPONSES["unknown"])
+
+# Main chatbot function
+def chatbot():
+    print("Chatbot: Hello! I am a simple chatbot. Type 'exit' to end the conversation.")
+    
+    while True:
+        user_input = input("You: ")
+        
+        if user_input.lower() == 'exit':
+            print("Chatbot: Goodbye! Have a great day!")
+            break
+        
+        response = get_response(user_input)
+        print("Chatbot:", response)
+
+if __name__ == "__main__":
+    chatbot()
