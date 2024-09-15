@@ -1,0 +1,89 @@
+import yfinance as yf
+
+class Stock:
+    def __init__(self, symbol, shares, purchase_price):
+        self.symbol = symbol.upper()
+        self.shares = shares
+        self.purchase_price = purchase_price
+        self.current_price = self.get_current_price()
+
+    def get_current_price(self):
+        stock_data = yf.Ticker(self.symbol)
+        return stock_data.history(period="1d")['Close'][0]  # Fetch current price
+
+    def calculate_value(self):
+        return self.shares * self.current_price
+
+    def calculate_profit_loss(self):
+        return (self.current_price - self.purchase_price) * self.shares
+
+class Portfolio:
+    def __init__(self):
+        self.stocks = []
+
+    def add_stock(self, symbol, shares, purchase_price):
+        stock = Stock(symbol, shares, purchase_price)
+        self.stocks.append(stock)
+        print(f"Added {shares} shares of {symbol} at {purchase_price} per share.")
+
+    def remove_stock(self, symbol):
+        for stock in self.stocks:
+            if stock.symbol == symbol.upper():
+                self.stocks.remove(stock)
+                print(f"Removed {stock.symbol} from your portfolio.")
+                return
+        print(f"Stock {symbol} not found in your portfolio.")
+
+    def show_portfolio(self):
+        if not self.stocks:
+            print("Your portfolio is empty.")
+            return
+        total_value = 0
+        total_profit_loss = 0
+
+        print("Your Portfolio:")
+        print(f"{'Symbol':<10}{'Shares':<10}{'Purchase Price':<15}{'Current Price':<15}{'Value':<15}{'P/L':<15}")
+        for stock in self.stocks:
+            value = stock.calculate_value()
+            profit_loss = stock.calculate_profit_loss()
+            total_value += value
+            total_profit_loss += profit_loss
+            print(f"{stock.symbol:<10}{stock.shares:<10}{stock.purchase_price:<15}{stock.current_price:<15.2f}{value:<15.2f}{profit_loss:<15.2f}")
+        
+        print(f"\nTotal Portfolio Value: {total_value:.2f}")
+        print(f"Total Profit/Loss: {total_profit_loss:.2f}")
+
+def main():
+    portfolio = Portfolio()
+    
+    while True:
+        print("\nPortfolio Tracker Menu:")
+        print("1. Add Stock")
+        print("2. Remove Stock")
+        print("3. Show Portfolio")
+        print("4. Exit")
+        
+        choice = input("Enter your choice: ")
+        
+        if choice == '1':
+            symbol = input("Enter stock symbol: ")
+            shares = float(input("Enter number of shares: "))
+            purchase_price = float(input("Enter purchase price: "))
+            portfolio.add_stock(symbol, shares, purchase_price)
+        
+        elif choice == '2':
+            symbol = input("Enter stock symbol to remove: ")
+            portfolio.remove_stock(symbol)
+        
+        elif choice == '3':
+            portfolio.show_portfolio()
+        
+        elif choice == '4':
+            print("Exiting portfolio tracker.")
+            break
+
+        else:
+            print("Invalid option. Please try again.")
+
+if __name__ == "__main__":
+    main()
